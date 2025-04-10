@@ -1,5 +1,6 @@
-const sveltePreprocess = require('svelte-preprocess');
+// svelte.config.js
+import svelte from '@sveltejs/vite-plugin-svelte';
 
-module.exports = {
-  preprocess: sveltePreprocess(),
+export default {
+  plugins: [svelte()],
 };
