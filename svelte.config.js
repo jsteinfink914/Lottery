@@ -1,9 +1,5 @@
-import adapter from '@sveltejs/adapter-vercel';
-import { vitePreprocess } from '@sveltejs/kit/vite';
+const sveltePreprocess = require('svelte-preprocess');
 
-export default {
-  kit: {
-    adapter: adapter()
-  },
-  preprocess: vitePreprocess()
+module.exports = {
+  preprocess: sveltePreprocess(),
 };
