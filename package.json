@@ -2,16 +2,15 @@
     "name": "draft-lottery-app",
     "version": "1.0.0",
     "scripts": {
-      "dev": "vite dev",
-      "build": "vite build",
-      "preview": "vite preview"
+        "dev": "vite dev",
+        "build": "vite build",
+        "preview": "vite preview"
     },
-    "type":"module",
+    "type": "module",
     "devDependencies": {
-      "@sveltejs/adapter-auto": "^2.0.0",
-      "@sveltejs/kit": "next",
-      "svelte": "^3.59.2",
-      "vite": "^4.0.0"
+        "@sveltejs/adapter-auto": "^2.0.0",
+        "@sveltejs/kit": "next",
+        "svelte": "^3.59.2",
+        "vite": "^4.5.13"
     }
-  }
-  
+}
