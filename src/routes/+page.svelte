@@ -1,117 +1,99 @@
-<script>
-  import InputForm from '$lib/InputForm.svelte';
-  import MonteCarloResults from '$lib/MonteCarloResults.svelte';
-  import SpinningWheel from '$lib/SpinningWheel.svelte';
-  import { runMonteCarlo } from '$lib/lottery';
+<script lang="ts">
+  import { Team, pickOrder, monteCarlo } from '$lib/lottery';
+  import { onMount } from 'svelte';
+  let teams: Team[] = Array(6).fill(null).map(() => ({ name: '', odds: 1 }));
+  let picks: string[] = [];
+  let spinning = false;
+  let rounds = 1000;
+  let mcResults: Record<string, number[]> = {};
+  let wheel;
 
-  let teams = [
-    { name: '', odds: 0 },
-    { name: '', odds: 0 },
-    { name: '', odds: 0 },
-    { name: '', odds: 0 },
-    { name: '', odds: 0 },
-    { name: '', odds: 0 },
-  ];
-
-  let results = null;
-  let numSimulations = 10000;
-
-  let showWheel = false;
-  let draftOrder = [];
-
-  function updateTeams(updated) {
-    teams = updated;
+  function initWheel() {
+    wheel = new Winwheel({
+      'canvasId': 'wheelCanvas',
+      'numSegments': teams.length,
+      'segments': teams.map(t => ({ 'text': t.name || 'Team', 'fillStyle': '#' + Math.floor(Math.random()*16777215).toString(16) })),
+      'animation': {
+        'type': 'spinToStop',
+        'duration': 5,
+        'spins': 8,
+        'callbackFinished': onFinish
+      }
+    });
   }
 
-  function runSim() {
-    results = runMonteCarlo(teams, numSimulations);
+  onMount(() => {
+    initWheel();
+  });
+
+  function spin() {
+    if (spinning) return;
+    spinning = true;
+    wheel.startAnimation();
   }
 
-  function startWheel() {
-    draftOrder = [];
-    showWheel = true;
+  function onFinish() {
+    const segment = wheel.getIndicatedSegment();
+    picks.push(segment.text);
+    const remaining = teams.filter(t => !picks.includes(t.name));
+    teams = remaining;
+    initWheel();
+    spinning = false;
   }
 
-  function handlePick(winner) {
-    draftOrder.push(winner.name);
+  function runMC() {
+    mcResults = monteCarlo(teams, rounds);
   }
 </script>
 
-<style>
-  main {
-    max-width: 800px;
-    margin: auto;
-    padding: 2rem;
-    font-family: sans-serif;
-    color: #333;
-  }
-
-  h1 {
-    text-align: center;
-    color: #0066cc;
-  }
-
-  .controls {
-    margin-top: 2rem;
-    text-align: center;
-  }
-
-  .draft-results {
-    margin-top: 2rem;
-    text-align: center;
-  }
-
-  ol {
-    padding-left: 1.5rem;
-    font-size: 1.1rem;
-  }
-
-  input[type="number"] {
-    width: 80px;
-    margin-left: 0.5rem;
-  }
-
-  button {
-    margin-left: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #0066cc;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #004999;
-  }
-</style>
-
-<main>
-  <h1>Fantasy Football Draft Lottery</h1>
-
-  <InputForm {teams} onUpdate={updateTeams} />
-
-  <div class="controls">
-    <label>Simulations:</label>
-    <input type="number" bind:value={numSimulations} />
-    <button on:click={runSim}>Run Simulation</button>
-    <button on:click={startWheel}>Start Draft Lottery</button>
-  </div>
-
-  <MonteCarloResults {results} />
-
-  {#if showWheel}
-    <SpinningWheel {teams} onSelect={handlePick} />
-  {/if}
-
-  {#if draftOrder.length > 0}
-    <div class="draft-results">
-      <h2>Draft Order</h2>
-      <ol>
-        {#each draftOrder as name, i}
-          <li>{i + 1}. {name}</li>
-        {/each}
-      </ol>
+<h1>Fantasy Draft Lottery</h1>
+<div>
+  <h2>Teams & Odds</h2>
+  {#each teams as team, i}
+    <div>
+      <input placeholder="Team Name" bind:value={teams[i].name} />
+      <input type="number" placeholder="Odds" bind:value={teams[i].odds} min="1" />
     </div>
+  {/each}
+</div>
+<div>
+  <h2>Draft Wheel</h2>
+  <canvas id="wheelCanvas" width="500" height="500"></canvas>
+  <button on:click={spin} disabled={spinning}>Spin</button>
+  <h3>Picks:</h3>
+  <ol>
+    {#each picks as pick}<li>{pick}</li>{/each}
+  </ol>
+</div>
+<div>
+  <h2>Monte Carlo Simulation</h2>
+  <input type="number" bind:value={rounds} min="1" />
+  <button on:click={runMC}>Run Simulation</button>
+  {#if Object.keys(mcResults).length}
+    <table>
+      <thead>
+        <tr>
+          <th>Team</th>
+          {#each Array(teams.length) as _, idx}
+            <th>Pick {idx+1}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each Object.keys(mcResults) as team}
+          <tr>
+            <td>{team}</td>
+            {#each mcResults[team] as count}
+              <td>{count}</td>
+            {/each}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   {/if}
-</main>
+</div>
+
+<style>
+  div { margin-bottom: 1rem; }
+  input { margin-right: 0.5rem; }
+</style>
