@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "fantasy-draft-lottery",
   "version": "1.0.0",
   "scripts": {
