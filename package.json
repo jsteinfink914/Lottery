@@ -7,7 +7,7 @@
     "preview": "svelte-kit preview"
   },
   "devDependencies": {
-    "@sveltejs/adapter-vercel": "^2.4.3",
+    "@sveltejs/adapter-vercel": "^5.7.0",
     "@sveltejs/kit": "^2.20.5",
     "svelte": "^5.26.1",
     "vite": "^6.2.6"
