@@ -1,3 +1,8 @@
+<svelte:head>
+  <script src="https://cdn.jsdelivr.net/npm/winwheel@2.7.0/Winwheel.min.js"></script>
+</svelte:head>
+
+
 <script lang="ts">
   import { Team, pickOrder, monteCarlo } from '$lib/lottery';
   import { onMount } from 'svelte';
