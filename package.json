@@ -11,5 +11,8 @@
     "@sveltejs/kit": "^2.20.5",
     "svelte": "^5.26.1",
     "vite": "^6.2.6"
-  }
+  },
+  "engines": {
+  "node": "16.x"
+}
 }

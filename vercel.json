@@ -5,11 +5,5 @@
       "src": "src/routes/+page.svelte",
       "use": "@sveltejs/adapter-vercel"
     }
-  ],
-  "routes": [
-    {
-      "src": "/",
-      "dest": "/src/routes/+page.svelte"
-    }
   ]
 }
